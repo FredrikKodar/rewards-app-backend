@@ -1,7 +1,7 @@
 package com.fredande.rewardsappbackend;
 
 import com.fredande.rewardsappbackend.model.User;
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,8 +33,11 @@ public class CustomUserDetails implements UserDetails {
     }
 
     @Override
-    public String getUsername() {
+    public @NonNull String getUsername() {
         if (user.getEmail() == null) {
+            if (user.getUsername() == null) {
+                return "";
+            }
             return user.getUsername();
         }
         return user.getEmail();
