@@ -11,7 +11,6 @@ import com.fredande.rewardsappbackend.model.User;
 import com.fredande.rewardsappbackend.repository.TaskRepository;
 import com.fredande.rewardsappbackend.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
