@@ -20,7 +20,7 @@ public class CustomUserDetails implements UserDetails {
 
     // TODO Subject to change when implementing Role
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public @NonNull Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
     }
 
