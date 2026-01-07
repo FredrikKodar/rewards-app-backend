@@ -1,7 +1,7 @@
 package com.fredande.rewardsappbackend.service;
 
 import com.fredande.rewardsappbackend.CustomUserDetails;
-import com.fredande.rewardsappbackend.dto.ChildCreationRequest;
+import com.fredande.rewardsappbackend.dto.ChildRegistrationRequest;
 import com.fredande.rewardsappbackend.dto.ChildResponse;
 import com.fredande.rewardsappbackend.dto.UserResponse;
 import com.fredande.rewardsappbackend.enums.Role;
@@ -32,7 +32,6 @@ public class UserService {
         }
     }
 
-
     public UserResponse getUserById(Integer id, CustomUserDetails userDetails) {
         User user = userRepository.findById(userDetails.getId()).orElseThrow(EntityNotFoundException::new);
         if (!id.equals(user.getId())) {
@@ -42,10 +41,10 @@ public class UserService {
     }
 
     @PreAuthorize("hasAuthority('PARENT')")
-    public ChildResponse addChild(ChildCreationRequest request, CustomUserDetails userDetails) {
+    public ChildResponse registerChild(ChildRegistrationRequest request, CustomUserDetails userDetails) {
         User child = new User();
         User parent = userRepository.findById(userDetails.getId()).orElseThrow(EntityNotFoundException::new);
-        child.setFirstName(request.firstName());
+        child.setFirstName(request.getFirstName());
         child.setParent(parent);
         child.setRole(Role.CHILD);
         return UserMapper.INSTANCE.userToChildResponse(userRepository.save(child));
