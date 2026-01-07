@@ -96,7 +96,7 @@ public class AuthenticationServiceImpl implements AuthenticationServiceDef {
         User child = new User();
         User parent = userRepository.findById(userDetails.getId()).orElseThrow(EntityNotFoundException::new);
         child.setPassword(passwordEncoder.encode(request.getPassword()));
-        child.setUserName(request.getUsername());
+        child.setUsername(request.getUsername());
         child.setFirstName(request.getFirstName());
         child.setParent(parent);
         child.setRole(Role.CHILD);
