@@ -2,7 +2,6 @@ package com.fredande.rewardsappbackend.controller;
 
 import com.fredande.rewardsappbackend.CustomUserDetails;
 import com.fredande.rewardsappbackend.dto.*;
-import com.fredande.rewardsappbackend.enums.Role;
 import com.fredande.rewardsappbackend.model.User;
 import com.fredande.rewardsappbackend.testUtils.TestUtils;
 import jakarta.transaction.Transactional;
