@@ -7,7 +7,6 @@ import com.fredande.rewardsappbackend.dto.TaskSavedResponse;
 import com.fredande.rewardsappbackend.dto.TaskUpdateRequest;
 import com.fredande.rewardsappbackend.service.TaskService;
 import jakarta.validation.Valid;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -68,8 +67,15 @@ public class TaskController {
     // Toggle status between ASSIGNED and PENDING_APPROVAL.
     @PatchMapping("/{id}/toggle-status-child")
     public ResponseEntity<TaskReadResponse> toggleStatusChild(@PathVariable Integer id,
-                                                              @AuthenticationPrincipal CustomUserDetails userDetails) throws BadRequestException {
+                                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.status(201).body(taskService.toggleStatus(id, userDetails));
+    }
+
+    // Toggle status from PENDING_APPROVAL to APPROVED.
+    @PatchMapping("/{id}/approve")
+    public ResponseEntity<TaskReadResponse> approve(@PathVariable Integer id,
+                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.status(201).body(taskService.approve(id, userDetails));
     }
 
 }
