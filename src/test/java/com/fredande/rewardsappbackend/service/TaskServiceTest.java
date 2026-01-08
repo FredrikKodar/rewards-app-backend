@@ -5,11 +5,13 @@ import com.fredande.rewardsappbackend.dto.TaskCreationRequest;
 import com.fredande.rewardsappbackend.dto.TaskReadResponse;
 import com.fredande.rewardsappbackend.dto.TaskSavedResponse;
 import com.fredande.rewardsappbackend.dto.TaskUpdateRequest;
+import com.fredande.rewardsappbackend.enums.TaskStatus;
 import com.fredande.rewardsappbackend.model.Task;
 import com.fredande.rewardsappbackend.model.User;
 import com.fredande.rewardsappbackend.repository.TaskRepository;
 import com.fredande.rewardsappbackend.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static com.fredande.rewardsappbackend.enums.TaskStatus.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -65,7 +68,7 @@ class TaskServiceTest {
     }
 
     @Test
-    void getAllTasksByUser_valid() {
+    void get_AllTasksByUser_valid() {
 
         // Arrange
         String title = "This is the title";
@@ -204,7 +207,7 @@ class TaskServiceTest {
      * A valid method call should return a TaskReadResponse DTO.
      */
     @Test
-    void getTaskByIdAndUser_valid() {
+    void get_TaskByIdAndUser_valid() {
         // Arrange
         String title = "This is the title";
         String description = "Here is the description";
@@ -239,7 +242,7 @@ class TaskServiceTest {
      * Attempting to get a task that is related to another user should throw EntityNotFoundException.
      */
     @Test
-    void getTaskByIdAndUser_invalid_userTaskMismatch() {
+    void get_TaskByIdAndUser_invalid_userTaskMismatch() {
         // Arrange
         Integer task_id = 4;
         User user1 = new User();
@@ -248,9 +251,7 @@ class TaskServiceTest {
         when(userRepository.findById(userDetails.getId())).thenReturn(Optional.of(user1));
         when(taskRepository.findByIdAndUser(task_id, user1)).thenReturn(Optional.empty());
 
-        // Act
-
-        // Assert
+        // Act & Assert
         assertThrows(EntityNotFoundException.class, () -> taskService.getTaskByIdAndUser(task_id, userDetails));
         verify(userRepository).findById(any(Integer.class));
         verify(taskRepository).findByIdAndUser(any(Integer.class), any(User.class));
