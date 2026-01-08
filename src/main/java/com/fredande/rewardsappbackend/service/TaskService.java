@@ -11,15 +11,13 @@ import com.fredande.rewardsappbackend.model.User;
 import com.fredande.rewardsappbackend.repository.TaskRepository;
 import com.fredande.rewardsappbackend.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.apache.coyote.BadRequestException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 
-import static com.fredande.rewardsappbackend.enums.TaskStatus.ASSIGNED;
-import static com.fredande.rewardsappbackend.enums.TaskStatus.PENDING_APPROVAL;
+import static com.fredande.rewardsappbackend.enums.TaskStatus.*;
 
 @Service
 public class TaskService {
@@ -67,6 +65,16 @@ public class TaskService {
     }
 
     @PreAuthorize("hasRole('PARENT') or hasRole('CHILD')")
+    public TaskReadResponse getTaskByIdAndUser(Integer id, CustomUserDetails userDetails) {
+        User user = userRepository.findById(userDetails.getId()).orElseThrow();
+        Task savedTask = taskRepository.findByIdAndUser(id, user).orElse(null);
+        if (savedTask == null) {
+            throw new EntityNotFoundException("User-task mismatch");
+        }
+        return TaskMapper.INSTANCE.taskToTaskReadResponse(savedTask);
+    }
+
+    @PreAuthorize("hasRole('PARENT') or hasRole('CHILD')")
     public List<TaskReadResponse> getAllTasksByUser(CustomUserDetails userDetails) {
         return taskRepository.findByUser(userRepository.findById(userDetails.getId()).orElseThrow())
                 .stream()
@@ -98,7 +106,14 @@ public class TaskService {
                 savedTask.getStatus() != updatedTask.status()) {
             updated = true;
             savedTask.setStatus(updatedTask.status());
-            userService.updatePoints(user.getId(), savedTask.getPoints(), updatedTask.status());
+            if (savedTask.getStatus().equals(APPROVED)
+                    && (updatedTask.status().equals(PENDING_APPROVAL) || updatedTask.status().equals(ASSIGNED))
+                    ||
+                    (savedTask.getStatus().equals(PENDING_APPROVAL) || savedTask.getStatus().equals(ASSIGNED)
+                            && updatedTask.status().equals(APPROVED))
+            ) {
+                userService.updatePoints(savedTask.getUser().getId(), savedTask.getPoints(), updatedTask.status());
+            }
         }
         if (updated) {
             savedTask.setUpdated(new Date());
@@ -108,7 +123,7 @@ public class TaskService {
     }
 
     @PreAuthorize("hasRole('CHILD')")
-    public TaskReadResponse toggleStatus(Integer id, CustomUserDetails userDetails) throws BadRequestException {
+    public TaskReadResponse toggleStatus(Integer id, CustomUserDetails userDetails) {
         Task savedTask = taskRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         User user = userRepository.findById(userDetails.getId()).orElseThrow(EntityNotFoundException::new);
         if (!savedTask.getUser().equals(user)) {
@@ -119,7 +134,7 @@ public class TaskService {
         } else if (savedTask.getStatus().equals(PENDING_APPROVAL)) {
             savedTask.setStatus(ASSIGNED);
         } else {
-            throw new BadRequestException("User not allowed to change status");
+            throw new EntityNotFoundException("User not allowed to change status");
         }
         savedTask.setUpdated(new Date());
         taskRepository.save(savedTask);
