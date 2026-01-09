@@ -323,4 +323,47 @@ class TaskServiceTest {
 
     }
 
+    @Test
+    void get_TasksPendingApproval_valid_onePendingApproval() {
+        // Arrange
+        User parent = new User();
+        parent.setId(1);
+        CustomUserDetails userDetails = new CustomUserDetails(parent);
+        Task task = new Task();
+        task.setStatus(PENDING_APPROVAL);
+        task.setCreatedBy(parent);
+        task.setTitle("title");
+        task.setDescription("description");
+        when(userRepository.findById(1)).thenReturn(Optional.of(parent));
+        when(taskRepository.findAllByCreatedByAndStatus(parent, PENDING_APPROVAL)).thenReturn(List.of(task));
+
+        // Act
+        var response = taskService.getTasksPendingApproval(userDetails);
+
+        // Assert
+        assertEquals(1, response.size());
+        assertEquals(PENDING_APPROVAL, response.get(0).status());
+        verify(taskRepository, times(1)).findAllByCreatedByAndStatus(parent, PENDING_APPROVAL);
+
+    }
+
+    @Test
+    void get_TasksPendingApproval_valid_noPendingApproval() {
+        // Arrange
+        User parent = new User();
+        parent.setId(1);
+        CustomUserDetails userDetails = new CustomUserDetails(parent);
+
+        when(userRepository.findById(1)).thenReturn(Optional.of(parent));
+        when(taskRepository.findAllByCreatedByAndStatus(parent, PENDING_APPROVAL)).thenReturn(Collections.emptyList());
+
+        // Act
+        var response = taskService.getTasksPendingApproval(userDetails);
+
+        // Assert
+        assertTrue(response.isEmpty());
+        verify(taskRepository, times(1)).findAllByCreatedByAndStatus(parent, PENDING_APPROVAL);
+
+    }
+
 }
