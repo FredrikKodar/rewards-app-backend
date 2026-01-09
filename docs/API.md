@@ -19,6 +19,7 @@
     * [Create Task for Child](#create-task-for-child)
     * [Get All Tasks](#get-all-tasks)
     * [Get Task by ID](#get-task-by-id)
+    * [Get tasks with status PENDING_APPROVAL](#get-tasks-with-status-pending_approval)
     * [Update Task](#update-task)
     * [Toggle Task Status (Child)](#toggle-task-status-child)
     * [Approve Task](#approve-task)
@@ -285,6 +286,30 @@ http://localhost:8080/api
   "updated": "2026-01-09T10:00:00.000+00:00",
   "status": "ASSIGNED"
 }
+```
+
+---
+
+### Get tasks with status PENDING_APPROVAL
+
+| Method | Endpoint                  | Description                                               | Authentication Required |
+|--------|---------------------------|-----------------------------------------------------------|-------------------------|
+| GET    | `/tasks/pending-approval` | Get user's created tasks where status is PENDING_APPROVAL | Yes (Parent)            |
+
+**Response (200 OK):**
+
+```json
+[
+  {
+    "id": 1,
+    "title": "Clean your room",
+    "description": "Vacuum the floor and organize your desk",
+    "points": 50,
+    "created": "2026-01-09T10:00:00.000+00:00",
+    "updated": "2026-01-09T10:00:00.000+00:00",
+    "status": "PENDING_APPROVAL"
+  }
+]
 ```
 
 ---
