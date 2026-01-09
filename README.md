@@ -48,9 +48,19 @@ progress.
 
 ### Running the Application
 
+**With environment variables:**
+
 ```bash
-mvn spring-boot:run
+mvn spring-boot:run \
+  -Dspring-boot.run.arguments="\
+    --DB_URL=jdbc:mysql://localhost:3306/rewards_db \
+    --DB_USER=your_username \
+    --DB_PASSWORD=your_password \
+    --SECRET_KEY=your-secret-key-at-least-256-bits \
+    --JWT_EXPIRES_IN=86400000"
 ```
+
+**Replace** the values with your actual database credentials and JWT secret key.
 
 Application runs on `http://localhost:8080`
 
