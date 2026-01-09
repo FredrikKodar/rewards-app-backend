@@ -83,6 +83,15 @@ public class TaskService {
     }
 
     @PreAuthorize("hasRole('PARENT')")
+    public List<TaskReadResponse> getTasksPendingApproval(CustomUserDetails userDetails) {
+        User user = userRepository.findById(userDetails.getId()).orElseThrow(EntityNotFoundException::new);
+        return taskRepository.findAllByCreatedByAndStatus(user, PENDING_APPROVAL)
+                .stream()
+                .map(TaskMapper.INSTANCE::taskToTaskReadResponse)
+                .toList();
+    }
+
+    @PreAuthorize("hasRole('PARENT')")
     public TaskReadResponse update(Integer id, CustomUserDetails userDetails, TaskUpdateRequest updatedTask) {
         Task savedTask = taskRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         User user = userRepository.findById(userDetails.getId()).orElseThrow(EntityNotFoundException::new);
