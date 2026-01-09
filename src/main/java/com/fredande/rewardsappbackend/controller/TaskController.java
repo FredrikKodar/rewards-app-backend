@@ -27,16 +27,18 @@ public class TaskController {
     // CREATE
 
     @PostMapping
-    public ResponseEntity<TaskSavedResponse> create(@RequestBody @Valid TaskCreationRequest taskCreationRequest,
-                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<TaskSavedResponse> create(
+            @RequestBody @Valid TaskCreationRequest taskCreationRequest,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.status(201).body(taskService.createTaskOnParent(taskCreationRequest, userDetails));
     }
 
 
     @PostMapping("/{childId}")
-    public ResponseEntity<TaskSavedResponse> createTaskByChildId(@RequestBody @Valid TaskCreationRequest taskCreationRequest,
-                                                                 @AuthenticationPrincipal CustomUserDetails userDetails,
-                                                                 @PathVariable Integer childId) {
+    public ResponseEntity<TaskSavedResponse> createTaskByChildId(
+            @RequestBody @Valid TaskCreationRequest taskCreationRequest,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Integer childId) {
         return ResponseEntity.status(201).body(taskService.createTaskOnChildByChildId(taskCreationRequest, userDetails, childId));
     }
 
@@ -44,37 +46,48 @@ public class TaskController {
     // READ
 
     @GetMapping
-    public ResponseEntity<List<TaskReadResponse>> getAllTasksByUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<List<TaskReadResponse>> getAllTasksByUser(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.status(200).body(taskService.getAllTasksByUser(userDetails));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskReadResponse> getTaskByIdAndUser(@PathVariable Integer id,
-                                                               @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<TaskReadResponse> getTaskByIdAndUser(
+            @PathVariable Integer id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.status(200).body(taskService.getTaskByIdAndUser(id, userDetails));
+    }
+
+    @GetMapping("/pending-approval")
+    public ResponseEntity<List<TaskReadResponse>> getTasksPendingApproval(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.status(200).body(taskService.getTasksPendingApproval(userDetails));
     }
 
 
     // UPDATE
 
     @PatchMapping("/{id}")
-    public ResponseEntity<TaskReadResponse> update(@PathVariable Integer id,
-                                                   @RequestBody @Valid TaskUpdateRequest updatedTask,
-                                                   @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<TaskReadResponse> update(
+            @PathVariable Integer id,
+            @RequestBody @Valid TaskUpdateRequest updatedTask,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.status(201).body(taskService.update(id, userDetails, updatedTask));
     }
 
     // Toggle status between ASSIGNED and PENDING_APPROVAL.
     @PatchMapping("/{id}/toggle-status-child")
-    public ResponseEntity<TaskReadResponse> toggleStatusChild(@PathVariable Integer id,
-                                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<TaskReadResponse> toggleStatusChild(
+            @PathVariable Integer id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.status(201).body(taskService.toggleStatus(id, userDetails));
     }
 
     // Toggle status from PENDING_APPROVAL to APPROVED.
     @PatchMapping("/{id}/approve")
-    public ResponseEntity<TaskReadResponse> approve(@PathVariable Integer id,
-                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<TaskReadResponse> approve(
+            @PathVariable Integer id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.status(201).body(taskService.approve(id, userDetails));
     }
 
