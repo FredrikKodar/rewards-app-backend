@@ -43,13 +43,11 @@ class UserServiceTest {
 
         // Act
         userService.updatePoints(1, 10, APPROVED);
-        User updatedUser = userRepository.findById(user.getId()).orElse(null);
 
         // Assert
-        assert updatedUser != null;
-        assertEquals(30, updatedUser.getTotalPoints());
-        assertEquals(20, updatedUser.getCurrentPoints());
-        verify(userRepository, times(2)).findById(any(Integer.class));
+        assertEquals(30, user.getTotalPoints());
+        assertEquals(20, user.getCurrentPoints());
+        verify(userRepository, times(1)).findById(any(Integer.class));
 
     }
 
@@ -68,13 +66,11 @@ class UserServiceTest {
 
         // Act
         userService.updatePoints(1, 10, ASSIGNED);
-        User updatedUser = userRepository.findById(user.getId()).orElse(null);
 
         // Assert
-        assert updatedUser != null;
-        assertEquals(10, updatedUser.getTotalPoints());
-        assertEquals(0, updatedUser.getCurrentPoints());
-        verify(userRepository, times(2)).findById(any(Integer.class));
+        assertEquals(10, user.getTotalPoints());
+        assertEquals(0, user.getCurrentPoints());
+        verify(userRepository, times(1)).findById(any(Integer.class));
 
     }
 
