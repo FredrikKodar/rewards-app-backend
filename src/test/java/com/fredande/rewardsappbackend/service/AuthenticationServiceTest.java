@@ -143,9 +143,6 @@ class AuthenticationServiceTest {
         String email = "test@test.test";
         String password = "pass1234";
         ParentRegistrationRequest parentRegistrationRequest = new ParentRegistrationRequest(email, password);
-        User user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
         User existingUser = new User();
         existingUser.setEmail(email);
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(existingUser));
