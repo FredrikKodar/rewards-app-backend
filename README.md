@@ -44,6 +44,7 @@ progress.
 
 - Java 21+
 - Maven 3.6+
+- MySQL 8.0+
 
 ### Running the Application
 
@@ -59,24 +60,24 @@ Application runs on `http://localhost:8080`
 src/
 ├── main/
 │   ├── java/com/fredande/rewardsappbackend/
-│   │   ├── config/                 # Configuration
-│   │   ├── controller/             # REST controllers
-│   │   ├── dto/                    # Data transfer objects
-│   │   ├── enums/                  # Enumerations
-│   │   ├── exceptionhandler/       # Exception handling
-│   │   ├── mapper/                 # Mappers
-│   │   ├── model/                  # Entity models
-│   │   ├── repository/             # Data access layer
-│   │   ├── security/               # Security configuration
-│   │   └── service/                # Business logic
+│   │   ├── config/                     # Configuration
+│   │   ├── controller/                 # REST controllers
+│   │   ├── dto/                        # Data transfer objects
+│   │   ├── enums/                      # Enumerations
+│   │   ├── exceptionhandler/           # Exception handling
+│   │   ├── mapper/                     # Mappers
+│   │   ├── model/                      # Entity models
+│   │   ├── repository/                 # Data access layer
+│   │   ├── security/                   # Security configuration
+│   │   └── service/                    # Business logic
 │   └── resources/
 │       └── application.properties      # Configuration for production environment
 │       └── application-test.properties # Configuration for testing environment
 └── test/
     └── java/com/fredande/rewardsappbackend/
-        ├── controller/      # Controller integration tests
-        ├── service/         # Service unit tests
-        └── testUtils/       # Helper classes for testing
+        ├── controller/                 # Controller integration tests
+        ├── service/                    # Service unit tests
+        └── testUtils/                  # Helper classes for testing
 ```
 
 ## Documentation
