@@ -276,7 +276,7 @@ class TaskServiceTest {
 
         // Assert
         assertEquals(1, response.size());
-        assertEquals(PENDING_APPROVAL, response.get(0).status());
+        assertEquals(PENDING_APPROVAL, response.getFirst().status());
         verify(taskRepository, times(1)).findAllByCreatedByAndStatus(parent, PENDING_APPROVAL);
 
     }
