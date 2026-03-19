@@ -31,9 +31,13 @@ export const taskService = {
   
   createTaskForChild: async (childId: number, taskData: TaskCreationRequest): Promise<TaskSavedResponse> => {
     try {
+      console.log('📤 Sending task creation request for child:', childId);
+      console.log('📄 Task data:', taskData);
       const response = await api.post(`/tasks/${childId}`, taskData);
+      console.log('📥 Task creation response:', response.data);
       return response.data;
     } catch (error) {
+      console.error('💥 Task creation API error:', error);
       return handleApiError(error);
     }
   },

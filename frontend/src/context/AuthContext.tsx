@@ -59,6 +59,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       // Step 2: Set token for API calls
       setAuthToken(authResponse.token);
+      console.log('🔐 Token set:', authResponse.token.substring(0, 20) + '...');
       
       // Step 3: Parse role from response
       const role = parseRoleFromAuthResponse(authResponse.roles);
