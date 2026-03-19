@@ -4,34 +4,39 @@ import { userService } from '../../services/userService';
 import { UserIdAndFirstNameResponse } from '../../types/user';
 import { PrimaryButton, SecondaryButton } from '../../components/ui/Button';
 import { PlusIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { ChildRegistrationForm } from '../../components/children/ChildRegistrationForm';
 
 export const ChildrenList: React.FC = () => {
   const { state } = useAuth();
   const [children, setChildren] = useState<UserIdAndFirstNameResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isChildFormOpen, setIsChildFormOpen] = useState(false);
+
+  const fetchChildren = async () => {
+    try {
+      setLoading(true);
+      const data = await userService.getChildren();
+      setChildren(data);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to load children');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchChildren = async () => {
-      try {
-        setLoading(true);
-        const data = await userService.getChildren();
-        setChildren(data);
-      } catch (error) {
-        setError(error instanceof Error ? error.message : 'An unknown error occurred');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     if (state.user) {
       fetchChildren();
     }
   }, [state.user]);
 
   const handleAddChild = () => {
-    // TODO: Implement child registration modal
-    console.log('Add child functionality to be implemented');
+    setIsChildFormOpen(true);
+  };
+
+  const handleChildRegistered = () => {
+    fetchChildren();
   };
 
   if (loading) {
@@ -110,10 +115,10 @@ export const ChildrenList: React.FC = () => {
                 </div>
               </div>
               <div className="mt-4 flex gap-2">
-                <SecondaryButton size="sm">
+                <SecondaryButton>
                   View Tasks
                 </SecondaryButton>
-                <SecondaryButton size="sm">
+                <SecondaryButton>
                   Edit
                 </SecondaryButton>
               </div>
@@ -121,6 +126,12 @@ export const ChildrenList: React.FC = () => {
           ))}
         </div>
       )}
+
+    <ChildRegistrationForm
+      isOpen={isChildFormOpen}
+      onClose={() => setIsChildFormOpen(false)}
+      onChildRegistered={handleChildRegistered}
+    />    
     </div>
   );
 };

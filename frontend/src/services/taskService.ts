@@ -62,9 +62,12 @@ export const taskService = {
   
   approveTask: async (taskId: number): Promise<TaskReadResponse> => {
     try {
+      console.log('👍 Approving task:', taskId);
       const response = await api.patch(`/tasks/${taskId}/approve`);
+      console.log('✅ Task approved:', response.data);
       return response.data;
     } catch (error) {
+      console.error('❌ Approval failed:', error);
       return handleApiError(error);
     }
   },
