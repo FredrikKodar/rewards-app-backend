@@ -164,6 +164,20 @@ public class TaskService {
     }
 
     @PreAuthorize("hasRole('PARENT')")
+    public TaskReadResponse deleteTask(Integer id, CustomUserDetails userDetails) {
+        Task task = taskRepository.findById(id).orElse(null);
+        if (task == null) {
+            return null;
+        }
+        List<TaskReadResponse> allTasks = new java.util.ArrayList<>();
+        for (Task t : taskRepository.findByUser(task.getUser())) {
+            allTasks.add(TaskMapper.INSTANCE.taskToTaskReadResponse(t));
+        }
+        taskRepository.delete(task);
+        return TaskMapper.INSTANCE.taskToTaskReadResponse(task);
+    }
+
+    @PreAuthorize("hasRole('PARENT')")
     public List<TaskReadResponse> getAllTasksByUserAndUserId(Integer userId, CustomUserDetails userDetails) {
         User requestingUser = userRepository.findById(userDetails.getId()).orElseThrow(EntityNotFoundException::new);
         User targetUser = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
