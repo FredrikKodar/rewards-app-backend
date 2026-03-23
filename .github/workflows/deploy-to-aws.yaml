@@ -16,6 +16,8 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 24
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -39,9 +41,9 @@ jobs:
         id: version
         run: |
           VERSION=$(grep -A1 '<artifactId>rewards-app-backend</artifactId>' pom.xml \
-            | grep '<version>' \                                                                                                  
+            | grep '<version>' \
             | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
-          echo "jar=target/rewards-app-backend-$VERSION.jar" >> $GITHUB_OUTPUT                                                    
+          echo "jar=target/rewards-app-backend-$VERSION.jar" >> $GITHUB_OUTPUT
 
       - name: Deploy to Beanstalk
         uses: einaregilsson/beanstalk-deploy@v22
