@@ -1,0 +1,57 @@
+name: Deploy to Elastic Beanstalk
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Install NPM
+        working-directory: frontend
+        run: npm install
+
+      - name: Build frontend with NPM
+        working-directory: frontend
+        run: npm run build
+
+      - name: Build with Maven
+        run: ./mvnw clean package -DskipTests
+
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(grep -A1 '<artifactId>rewards-app-backend</artifactId>' pom.xml \
+            | grep '<version>' \
+            | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+          echo "jar=target/rewards-app-backend-$VERSION.jar" >> $GITHUB_OUTPUT
+
+      - name: Deploy to Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: chorely
+          environment_name: chorely-env
+          version_label: ${{ github.ref_name }}
+          region: eu-north-1
+          deployment_package: ${{ steps.version.outputs.jar }}
