@@ -28,22 +28,40 @@ export const saveThemePreferences = (preferences: ThemePreferences): void => {
 export const applyTheme = (preferences: ThemePreferences): void => {
   const root = document.documentElement;
   
-  // Apply color scheme
-  if (preferences.colorScheme === 'indigo') {
-    root.style.setProperty('--primary-color', '#6366f1'); // indigo-600
-    root.style.setProperty('--primary-dark', '#4f46e5'); // indigo-700
-    root.style.setProperty('--primary-light', '#818cf8'); // indigo-400
+if (preferences.colorScheme === 'indigo') {
+    // Light mode: indigo-600, indigo-700, indigo-400
+    const primaryLight = '#6366f1';
+    const primaryDark = '#4f46e5';
+    const primaryLighter = '#818cf8';
+    
+    if (preferences.themeMode === 'dark') {
+      // Dark mode: swap hierarchy - lighter primary, original dark
+      root.style.setProperty('--primary-color', primaryLighter); // indigo-400 (lighter)
+      root.style.setProperty('--primary-dark', primaryLight);   // indigo-600 (original)
+      root.style.setProperty('--primary-light', primaryDark);   // indigo-700
+    } else {
+      // Light mode: normal hierarchy
+      root.style.setProperty('--primary-color', primaryLight);  // indigo-600
+      root.style.setProperty('--primary-dark', primaryDark);    // indigo-700
+      root.style.setProperty('--primary-light', primaryLighter); // indigo-400
+    }
   } else {
-    root.style.setProperty('--primary-color', '#059669'); // emerald-600
-    root.style.setProperty('--primary-dark', '#047857'); // emerald-700
-    root.style.setProperty('--primary-light', '#34d399'); // emerald-400
-  }
-  
-  // Apply theme mode
-  if (preferences.themeMode === 'dark') {
-    root.classList.add('dark');
-  } else {
-    root.classList.remove('dark');
+    // Emerald scheme
+    const primaryLight = '#059669';
+    const primaryDark = '#047857';
+    const primaryLighter = '#34d399';
+    
+    if (preferences.themeMode === 'dark') {
+      // Dark mode: swap hierarchy
+      root.style.setProperty('--primary-color', primaryLighter); // emerald-400 (lighter)
+      root.style.setProperty('--primary-dark', primaryLight);   // emerald-600 (original)
+      root.style.setProperty('--primary-light', primaryDark);   // emerald-700
+    } else {
+      // Light mode: normal hierarchy
+      root.style.setProperty('--primary-color', primaryLight);  // emerald-600
+      root.style.setProperty('--primary-dark', primaryDark);    // emerald-700
+      root.style.setProperty('--primary-light', primaryLighter); // emerald-400
+    }
   }
 };
 
