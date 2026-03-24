@@ -2,7 +2,6 @@ package com.fredande.rewardsappbackend.controller;
 
 import com.fredande.rewardsappbackend.TestcontainersConfig;
 import com.fredande.rewardsappbackend.dto.UserResponse;
-import com.fredande.rewardsappbackend.enums.Role;
 import com.fredande.rewardsappbackend.model.User;
 import com.fredande.rewardsappbackend.repository.UserRepository;
 import com.fredande.rewardsappbackend.testUtils.TestUtils;

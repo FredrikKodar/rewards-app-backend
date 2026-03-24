@@ -1,7 +1,6 @@
 package com.fredande.rewardsappbackend.testUtils;
 
 import com.fredande.rewardsappbackend.dto.AuthResponse;
-import com.fredande.rewardsappbackend.enums.Role;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
