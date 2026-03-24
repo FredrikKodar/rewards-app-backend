@@ -2,7 +2,7 @@ package com.fredande.rewardsappbackend.dto;
 
 import jakarta.validation.constraints.*;
 
-public class ParentRegistrationRequest {
+public class ParentRequest {
 
     private final int minPasswordLength = 8;
     private final int maxPasswordLength = 40;
@@ -16,11 +16,16 @@ public class ParentRegistrationRequest {
             max = maxPasswordLength,
             message = "Password must be " + minPasswordLength + " to " + maxPasswordLength + " characters")
     private String password;
+    @NotBlank(message = "First name is required")
+    private String firstName;
 
-    public ParentRegistrationRequest() {
+    @NotBlank(message = "Last name is required")
+    private String lastName;
+
+    public ParentRequest() {
     }
 
-    public ParentRegistrationRequest(String email, String password) {
+    public ParentRequest(String email, String password) {
         this.email = email;
         this.password = password;
     }
@@ -39,6 +44,32 @@ public class ParentRegistrationRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getFirstName() {
+    return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+public ParentRequest withFirstName(String firstName) {
+        this.firstName = firstName;
+        return this;
+    }
+
+    public ParentRequest withLastName(String lastName) {
+        this.lastName = lastName;
+        return this;
     }
 
 }

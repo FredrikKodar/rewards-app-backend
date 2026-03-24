@@ -4,7 +4,7 @@ import com.fredande.rewardsappbackend.config.CustomUserDetails;
 import com.fredande.rewardsappbackend.config.CustomUserDetailsService;
 import com.fredande.rewardsappbackend.dto.ChildRegistrationRequest;
 import com.fredande.rewardsappbackend.dto.LoginRequest;
-import com.fredande.rewardsappbackend.dto.ParentRegistrationRequest;
+import com.fredande.rewardsappbackend.dto.ParentRequest;
 import com.fredande.rewardsappbackend.model.User;
 import com.fredande.rewardsappbackend.repository.UserRepository;
 import jakarta.persistence.EntityExistsException;
@@ -116,13 +116,13 @@ class AuthenticationServiceTest {
         //Arrange
         String email = "test@test.test";
         String password = "pass1234";
-        ParentRegistrationRequest parentRegistrationRequest = new ParentRegistrationRequest(email, password);
+        ParentRequest parentRequest = new ParentRequest(email, password);
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        when(userRepository.findByEmail(parentRegistrationRequest.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(parentRequest.getEmail())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(password)).thenReturn("encoded_password");
 
         //Act
-        authenticationService.registerParent(parentRegistrationRequest);
+        authenticationService.registerParent(parentRequest);
 
         //Assert
         verify(userRepository).save(userCaptor.capture());
@@ -142,7 +142,7 @@ class AuthenticationServiceTest {
         //Arrange
         String email = "test@test.test";
         String password = "pass1234";
-        ParentRegistrationRequest parentRegistrationRequest = new ParentRegistrationRequest(email, password);
+        ParentRequest parentRequest = new ParentRequest(email, password);
         User existingUser = new User();
         existingUser.setEmail(email);
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(existingUser));
@@ -151,7 +151,7 @@ class AuthenticationServiceTest {
 
         //Assert
         assertThrows(EntityExistsException.class,
-                () -> authenticationService.registerParent(parentRegistrationRequest));
+                () -> authenticationService.registerParent(parentRequest));
         verify(userRepository).findByEmail(email);
     }
 
