@@ -1,7 +1,7 @@
 package com.fredande.rewardsappbackend.controller;
 
 import com.fredande.rewardsappbackend.config.CustomUserDetails;
-import com.fredande.rewardsappbackend.dto.UserIdAndFirstNameResponse;
+import com.fredande.rewardsappbackend.dto.ParentRequest;import com.fredande.rewardsappbackend.dto.UserIdAndFirstNameResponse;
 import com.fredande.rewardsappbackend.dto.UserResponse;
 import com.fredande.rewardsappbackend.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +35,12 @@ public class UserController {
     @GetMapping("children")
     public ResponseEntity<List<UserIdAndFirstNameResponse>> getChildren(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.status(200).body(userService.getChildren(userDetails));
+    }
+
+    @PatchMapping()
+    public ResponseEntity<UserResponse> updateUser(@RequestBody ParentRequest request,
+                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.status(200).body(userService.updateUser(request, userDetails));
     }
 
     @PatchMapping("children/{childId}")
