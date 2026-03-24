@@ -1,29 +1,42 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { HomeIcon, ClipboardDocumentListIcon, CogIcon } from '@heroicons/react/24/outline';
+import { CogIcon, HomeIcon, UsersIcon, ClipboardDocumentListIcon, ClockIcon } from '@heroicons/react/24/outline';
 
-const navigation = [
-  { name: 'Dashboard', href: '/child/dashboard', icon: HomeIcon },
-  { name: 'Tasks', href: '/child/tasks', icon: ClipboardDocumentListIcon },
-  { name: 'Settings', href: '/settings', icon: CogIcon },
-];
-
-export const ChildLayout: React.FC = () => {
+export const SettingsLayout: React.FC = () => {
   const { state, logout } = useAuth();
   const location = useLocation();
+
+  // Determine navigation based on user role
+  const getNavigation = () => {
+    if (state.user?.role === 'PARENT') {
+      return [
+        { name: 'Dashboard', href: '/parent/dashboard', icon: HomeIcon },
+        { name: 'Children', href: '/parent/children', icon: UsersIcon },
+        { name: 'Tasks', href: '/parent/tasks', icon: ClipboardDocumentListIcon },
+        { name: 'History', href: '/parent/history', icon: ClockIcon },
+      ];
+    } else {
+      return [
+        { name: 'Dashboard', href: '/child/dashboard', icon: HomeIcon },
+        { name: 'Tasks', href: '/child/tasks', icon: ClipboardDocumentListIcon },
+      ];
+    }
+  };
+
+  const navigation = getNavigation();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Mobile header */}
-      <div className="bg-primary dark:bg-primary-dark pb-32">
+      <div className="pb-32" style={{ backgroundColor: 'var(--primary-color)' }}>
         <header className="py-4 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <div className="flex items-center">
-            <h1 className="text-white text-xl font-semibold">My Tasks</h1>
+            <h1 className="text-white text-xl font-semibold">Settings</h1>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-white text-sm">
-              Welcome, {state.user?.firstName || 'Child'}
+              Welcome, {state.user?.firstName || 'User'}
             </span>
             <button
               onClick={logout}
@@ -36,28 +49,10 @@ export const ChildLayout: React.FC = () => {
             </button>
           </div>
         </header>
-        
-        {/* Desktop navigation */}
-        <nav className="hidden md:flex md:flex-col md:space-y-1 px-4 sm:px-6 lg:px-8">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              to={item.href}
-              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
-                location.pathname === item.href
-                  ? 'bg-primary-dark text-white'
-                  : 'text-emerald-100 hover:bg-primary-dark hover:text-white'
-              }`}
-            >
-              <item.icon className="w-5 h-5 mr-3" aria-hidden="true" />
-              {item.name}
-            </Link>
-          ))}
-        </nav>
       </div>
 
       {/* Main content */}
-      <main className="-mt-32 pb-8">
+      <main className="-mt-32 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow px-4 py-6 sm:px-6 lg:px-8">
             <Outlet />
@@ -87,6 +82,13 @@ export const ChildLayout: React.FC = () => {
               </Link>
             );
           })}
+          <Link
+            to="/settings"
+            className={`flex flex-col items-center justify-center flex-1 h-full text-primary dark:text-primary-light`}
+          >
+            <CogIcon className="h-6 w-6" aria-hidden="true" />
+            <span className="text-xs mt-1">Settings</span>
+          </Link>
         </div>
       </div>
     </div>

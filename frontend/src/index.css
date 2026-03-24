@@ -4,8 +4,46 @@
 
 :root {
   font-family: 'Inter', sans-serif;
+  --primary-color: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #818cf8;
 }
 
-body {
-  @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white;
+.dark {
+  --primary-color: var(--primary-light);
+  --primary-dark: var(--primary-color);
+}
+
+/* Apply CSS variables to Tailwind classes */
+.bg-primary {
+  background-color: var(--primary-color);
+}
+
+.bg-primary-dark {
+  background-color: var(--primary-dark);
+}
+
+.text-primary {
+  color: var(--primary-color);
+}
+
+.border-primary {
+  border-color: var(--primary-color);
+}
+
+/* Dark mode overrides */
+.dark .bg-indigo-600 {
+  background-color: var(--primary-color);
+}
+
+.dark .bg-indigo-700 {
+  background-color: var(--primary-dark);
+}
+
+.dark .bg-emerald-600 {
+  background-color: var(--primary-color);
+}
+
+.dark .bg-emerald-700 {
+  background-color: var(--primary-dark);
 }
