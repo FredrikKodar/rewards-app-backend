@@ -8,7 +8,7 @@ import com.fredande.rewardsappbackend.dto.ParentRequest;
 import com.fredande.rewardsappbackend.model.User;
 import com.fredande.rewardsappbackend.repository.UserRepository;
 import jakarta.persistence.EntityExistsException;
-import jakarta.validation.ValidationException;import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
