@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/FredrikKodar/rewards-app-backend/compare/v1.0.1...v1.1.0) (2026-03-24)
+
+
+### Features
+
+* complete theme system with color schemes and dark mode ([#31](https://github.com/FredrikKodar/rewards-app-backend/issues/31)) ([b687699](https://github.com/FredrikKodar/rewards-app-backend/commit/b687699aac07459cd6cdea4a5242bd49ad103d45))
+
 ## [1.0.1](https://github.com/FredrikKodar/rewards-app-backend/compare/v1.0.0...v1.0.1) (2026-03-23)
 
 
