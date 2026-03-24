@@ -31,7 +31,7 @@
   border-color: var(--primary-color);
 }
 
-/* Dark mode overrides */
+/* Dark mode overrides for color schemes */
 .dark .bg-indigo-600 {
   background-color: var(--primary-color);
 }
@@ -46,4 +46,15 @@
 
 .dark .bg-emerald-700 {
   background-color: var(--primary-dark);
+}
+
+/* Ensure dark mode works with Tailwind's dark: variants */
+@media (prefers-color-scheme: dark) {
+  .dark .text-indigo-100 {
+    color: rgba(165, 180, 252, 0.8);
+  }
+  
+  .dark .text-emerald-100 {
+    color: rgba(101, 163, 138, 0.8);
+  }
 }
