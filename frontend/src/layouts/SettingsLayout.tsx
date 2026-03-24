@@ -31,7 +31,7 @@ export const SettingsLayout: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Mobile header */}
-      <div className="pb-32" style={{ backgroundColor: 'var(--primary-color)' }}>
+      <div className="bg-primary dark:bg-primary-dark pb-32">
         <header className="py-4 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <div className="flex items-center">
             <h1 className="text-white text-xl font-semibold">Settings</h1>
