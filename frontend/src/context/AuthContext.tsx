@@ -20,7 +20,8 @@ type AuthAction =
   | { type: 'LOGOUT' }
   | { type: 'REGISTER_START' }
   | { type: 'REGISTER_SUCCESS' }
-  | { type: 'REGISTER_FAILURE'; payload: string };
+  | { type: 'REGISTER_FAILURE'; payload: string }
+  | { type: 'UPDATE_USER'; payload: User };
 
 const AuthContext = createContext<{
   state: AuthState;
@@ -29,6 +30,7 @@ const AuthContext = createContext<{
   logout: () => void;
   registerParent: (email: string, password: string) => Promise<void>;
   registerChild: (childData: any) => Promise<void>;
+  refreshUser: () => Promise<void>;
 }>({} as any);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -72,6 +74,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
   
+  const refreshUser = async () => {
+    if (!state.user?.role) return;
+    const userResponse = await userService.getCurrentUser();
+    dispatch({ type: 'UPDATE_USER', payload: { ...userResponse, role: state.user.role } });
+  };
+
   const logout = () => {
     clearAuthToken();
     dispatch({ type: 'LOGOUT' });
@@ -101,7 +109,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ state, dispatch, login, logout, registerParent, registerChild }}>
+    <AuthContext.Provider value={{ state, dispatch, login, logout, registerParent, registerChild, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
@@ -137,6 +145,8 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       return { ...state, loading: false, error: action.payload };
     case 'LOGIN_FAILURE':
       return { ...state, loading: false, error: action.payload };
+    case 'UPDATE_USER':
+      return { ...state, user: action.payload };
     default:
       return state;
   }

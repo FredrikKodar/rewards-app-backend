@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { PrimaryButton, SecondaryButton } from '../../components/ui/Button';
@@ -14,6 +14,13 @@ export const Register: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { registerParent } = useAuth();
   const navigate = useNavigate();
+  const redirectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimer.current) clearTimeout(redirectTimer.current);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,12 +46,7 @@ export const Register: React.FC = () => {
     try {
       await registerParent(email, password, firstName, lastName);
       setSuccess(true);
-      // Reset form
-      setEmail('');
-      setPassword('');
-      setConfirmPassword('');
-      setFirstName('');
-      setLastName('');
+      redirectTimer.current = setTimeout(() => navigate('/login'), 2000);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Registration failed. Please try again.');
     } finally {
@@ -74,7 +76,7 @@ export const Register: React.FC = () => {
               </div>
               <div className="ml-3">
                 <p className="text-sm text-green-700 dark:text-green-300">
-                  Registration successful! You can now log in.
+                  Registration successful! Redirecting to sign in...
                 </p>
               </div>
             </div>

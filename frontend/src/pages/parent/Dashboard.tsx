@@ -68,13 +68,15 @@ export const ParentDashboard: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Dashboard</h2>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           {state.user && (
             <UserDashboardCard user={state.user} className="mb-6" />
           )}
-          <TaskList tasks={tasks} title="Recent Tasks" />
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Recent Tasks</h2>
+          <TaskList tasks={tasks} />
         </div>
         <div className="space-y-6">
           {state.user && (

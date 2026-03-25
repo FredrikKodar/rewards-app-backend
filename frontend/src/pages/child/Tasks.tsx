@@ -1,18 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { taskService } from '../../services/taskService';
 import { TaskReadResponse } from '../../types/tasks';
 import { TaskList } from '../../components/tasks/TaskList';
+import { RefreshButton } from '../../components/ui/RefreshButton';
 
 export const ChildTasks: React.FC = () => {
   const { state } = useAuth();
   const [tasks, setTasks] = useState<TaskReadResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     const tasksData = await taskService.getTasks();
     setTasks(tasksData);
+  }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    setError(null);
+    try {
+      await fetchTasks();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to refresh tasks');
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const handleTaskToggle = async (taskId: number) => {
@@ -20,7 +34,6 @@ export const ChildTasks: React.FC = () => {
       await taskService.toggleStatus(taskId);
       await fetchTasks();
     } catch (err) {
-      console.error('Error toggling task status:', err);
       setError(err instanceof Error ? err.message : 'Failed to update task status');
     }
   };
@@ -31,7 +44,6 @@ export const ChildTasks: React.FC = () => {
         setLoading(true);
         await fetchTasks();
       } catch (err) {
-        console.error('Error loading tasks:', err);
         setError(err instanceof Error ? err.message : 'Failed to load tasks');
       } finally {
         setLoading(false);
@@ -41,7 +53,7 @@ export const ChildTasks: React.FC = () => {
     if (state.user) {
       loadTasks();
     }
-  }, [state.user]);
+  }, [state.user, fetchTasks]);
 
   if (loading) {
     return (
@@ -51,30 +63,17 @@ export const ChildTasks: React.FC = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="bg-red-50 border-l-4 border-red-400 p-4">
-        <div className="flex">
-          <div className="flex-shrink-0">
-            <svg className="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-          </div>
-          <div className="ml-3">
-            <p className="text-sm text-red-700 dark:text-red-300">
-              {error}
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-        My Tasks
-      </h2>
+      {error && (
+        <div className="bg-red-50 border-l-4 border-red-400 p-4">
+          <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+        </div>
+      )}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">My Tasks</h2>
+        <RefreshButton onClick={handleRefresh} refreshing={refreshing} />
+      </div>
 
       {tasks.length === 0 ? (
         <div className="text-center py-12">
@@ -93,7 +92,6 @@ export const ChildTasks: React.FC = () => {
       ) : (
         <TaskList
           tasks={tasks}
-          title="My Tasks"
           showToggle={true}
           onTaskToggle={handleTaskToggle}
         />
