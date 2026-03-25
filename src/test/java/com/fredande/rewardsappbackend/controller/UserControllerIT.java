@@ -1,10 +1,12 @@
 package com.fredande.rewardsappbackend.controller;
 
 import com.fredande.rewardsappbackend.TestcontainersConfig;
+import com.fredande.rewardsappbackend.dto.ParentUpdateRequest;
 import com.fredande.rewardsappbackend.dto.UserResponse;
 import com.fredande.rewardsappbackend.model.User;
 import com.fredande.rewardsappbackend.repository.UserRepository;
 import com.fredande.rewardsappbackend.testUtils.TestUtils;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,9 @@ class UserControllerIT {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @BeforeAll
     void beforeAll() {
@@ -105,6 +110,111 @@ class UserControllerIT {
         // Assert
         assertEquals(403, response.getStatusCode().value());
 
+    }
+
+    /**
+     * Authenticated PARENT sends valid first and last names.
+     *
+     * @Expected: 200 OK and response body reflects updated names.
+     */
+    @Test
+    void updateUser_valid() throws Exception {
+        // Arrange
+        String token = TestUtils.getToken(testRestTemplate, port, VALID_EMAIL, VALID_PASSWORD);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        ParentUpdateRequest body = new ParentUpdateRequest("NewFirst", "NewLast");
+        HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(body), headers);
+
+        // Act
+        ResponseEntity<UserResponse> response = testRestTemplate.exchange(
+                "http://localhost:" + port + "/api/users",
+                HttpMethod.PATCH,
+                request,
+                UserResponse.class);
+
+        // Assert
+        assertEquals(200, response.getStatusCode().value());
+        assert response.getBody() != null;
+        assertEquals("NewFirst", response.getBody().firstName());
+        assertEquals("NewLast", response.getBody().lastName());
+    }
+
+    /**
+     * Request without a JWT token should be rejected.
+     *
+     * @Expected: 403 Forbidden.
+     */
+    @Test
+    void updateUser_noAuth() throws Exception {
+        // Arrange
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        ParentUpdateRequest body = new ParentUpdateRequest("NewFirst", "NewLast");
+        HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(body), headers);
+
+        // Act
+        ResponseEntity<?> response = testRestTemplate.exchange(
+                "http://localhost:" + port + "/api/users",
+                HttpMethod.PATCH,
+                request,
+                String.class);
+
+        // Assert
+        assertEquals(403, response.getStatusCode().value());
+    }
+
+    /**
+     * Authenticated PARENT sends a blank first name.
+     *
+     * @Expected: 400 Bad Request.
+     */
+    @Test
+    void updateUser_invalid_firstName_blank() throws Exception {
+        // Arrange
+        String token = TestUtils.getToken(testRestTemplate, port, VALID_EMAIL, VALID_PASSWORD);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        ParentUpdateRequest body = new ParentUpdateRequest("", "NewLast");
+        HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(body), headers);
+
+        // Act
+        ResponseEntity<?> response = testRestTemplate.exchange(
+                "http://localhost:" + port + "/api/users",
+                HttpMethod.PATCH,
+                request,
+                String.class);
+
+        // Assert
+        assertEquals(400, response.getStatusCode().value());
+    }
+
+    /**
+     * Authenticated PARENT sends a blank last name.
+     *
+     * @Expected: 400 Bad Request.
+     */
+    @Test
+    void updateUser_invalid_lastName_blank() throws Exception {
+        // Arrange
+        String token = TestUtils.getToken(testRestTemplate, port, VALID_EMAIL, VALID_PASSWORD);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        ParentUpdateRequest body = new ParentUpdateRequest("NewFirst", "");
+        HttpEntity<String> request = new HttpEntity<>(objectMapper.writeValueAsString(body), headers);
+
+        // Act
+        ResponseEntity<?> response = testRestTemplate.exchange(
+                "http://localhost:" + port + "/api/users",
+                HttpMethod.PATCH,
+                request,
+                String.class);
+
+        // Assert
+        assertEquals(400, response.getStatusCode().value());
     }
 
 }
