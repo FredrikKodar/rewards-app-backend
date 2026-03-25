@@ -9,9 +9,9 @@ import org.springframework.http.ResponseEntity;
 
 public class TestUtils {
 
-        public static String FIRST_NAME = "FirstName";
+    public static final String FIRST_NAME = "FirstName";
 
-        public static String LAST_NAME = "LastName";
+    public static final String LAST_NAME = "LastName";
 
     public static String getToken(TestRestTemplate testRestTemplate, Integer port, String email, String password) {
         HttpHeaders headers = new HttpHeaders();
