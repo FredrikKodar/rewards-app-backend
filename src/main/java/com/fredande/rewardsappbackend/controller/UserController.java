@@ -1,7 +1,7 @@
 package com.fredande.rewardsappbackend.controller;
 
 import com.fredande.rewardsappbackend.config.CustomUserDetails;
-import com.fredande.rewardsappbackend.dto.ParentRequest;
+import com.fredande.rewardsappbackend.dto.ParentUpdateRequest;
 import com.fredande.rewardsappbackend.dto.UserIdAndFirstNameResponse;
 import com.fredande.rewardsappbackend.dto.UserResponse;
 import com.fredande.rewardsappbackend.service.UserService;
@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @PatchMapping()
-    public ResponseEntity<UserResponse> updateUser(@RequestBody @Valid ParentRequest request,
+    public ResponseEntity<UserResponse> updateUser(@RequestBody @Valid ParentUpdateRequest request,
                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.status(200).body(userService.updateUser(request, userDetails));
     }

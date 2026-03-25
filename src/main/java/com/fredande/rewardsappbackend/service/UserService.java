@@ -1,7 +1,7 @@
 package com.fredande.rewardsappbackend.service;
 
 import com.fredande.rewardsappbackend.config.CustomUserDetails;
-import com.fredande.rewardsappbackend.dto.ParentRequest;
+import com.fredande.rewardsappbackend.dto.ParentUpdateRequest;
 import com.fredande.rewardsappbackend.dto.UserIdAndFirstNameResponse;
 import com.fredande.rewardsappbackend.dto.UserResponse;
 import com.fredande.rewardsappbackend.enums.TaskStatus;
@@ -87,7 +87,7 @@ public class UserService {
     }
 
     @PreAuthorize("hasRole('PARENT')")
-    public UserResponse updateUser(ParentRequest request, CustomUserDetails userDetails) {
+    public UserResponse updateUser(ParentUpdateRequest request, CustomUserDetails userDetails) {
         User savedUser = userRepository.findById(userDetails.getId()).orElseThrow();
         if (!Objects.equals(request.firstName(), savedUser.getFirstName())) {
             savedUser.setFirstName(request.firstName());
