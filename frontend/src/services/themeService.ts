@@ -72,6 +72,12 @@ if (preferences.colorScheme === 'indigo') {
       root.style.setProperty('--primary-light', primaryLighter); // emerald-400
     }
   }
+
+  if (preferences.themeMode === 'dark') {
+    root.classList.add('dark');
+  } else {
+    root.classList.remove('dark');
+  }
 };
 
 // Initialize theme from saved preferences or use default

@@ -1,9 +1,11 @@
 package com.fredande.rewardsappbackend.controller;
 
 import com.fredande.rewardsappbackend.config.CustomUserDetails;
+import com.fredande.rewardsappbackend.dto.ParentUpdateRequest;
 import com.fredande.rewardsappbackend.dto.UserIdAndFirstNameResponse;
 import com.fredande.rewardsappbackend.dto.UserResponse;
 import com.fredande.rewardsappbackend.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -37,10 +39,16 @@ public class UserController {
         return ResponseEntity.status(200).body(userService.getChildren(userDetails));
     }
 
+    @PatchMapping()
+    public ResponseEntity<UserResponse> updateUser(@RequestBody @Valid ParentUpdateRequest request,
+                                                   @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.status(200).body(userService.updateUser(request, userDetails));
+    }
+
     @PatchMapping("children/{childId}")
     public ResponseEntity<UserIdAndFirstNameResponse> updateChild(@PathVariable Integer childId,
-                                                                 @RequestBody UserIdAndFirstNameResponse updatedChild,
-                                                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
+                                                                  @RequestBody UserIdAndFirstNameResponse updatedChild,
+                                                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.status(200).body(userService.updateChild(childId, userDetails, updatedChild));
     }
 

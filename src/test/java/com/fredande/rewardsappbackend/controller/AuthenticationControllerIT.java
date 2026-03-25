@@ -2,21 +2,26 @@ package com.fredande.rewardsappbackend.controller;
 
 import com.fredande.rewardsappbackend.TestcontainersConfig;
 import com.fredande.rewardsappbackend.dto.LoginRequest;
+import com.fredande.rewardsappbackend.dto.ParentRegistrationRequest;
 import com.fredande.rewardsappbackend.enums.Role;
 import com.fredande.rewardsappbackend.model.User;
 import com.fredande.rewardsappbackend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Import;import org.springframework.http.MediaType;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
+import static com.fredande.rewardsappbackend.testUtils.TestUtils.FIRST_NAME;
+import static com.fredande.rewardsappbackend.testUtils.TestUtils.LAST_NAME;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -56,12 +61,12 @@ class AuthenticationControllerIT {
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
 
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        LoginRequest request = new LoginRequest(email, password);
 
         // Act & Assert
         mvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").exists())
                 .andExpect(jsonPath("$.expiresIn").value(86400L))
@@ -88,12 +93,12 @@ class AuthenticationControllerIT {
         user.setRole(Role.PARENT);
         userRepository.save(user);
 
-        LoginRequest loginRequest = new LoginRequest(badEmail, password);
+        LoginRequest request = new LoginRequest(badEmail, password);
 
         // Act & Assert
         mvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Invalid email or password"));
     }
@@ -117,12 +122,12 @@ class AuthenticationControllerIT {
         user.setRole(Role.PARENT);
         userRepository.save(user);
 
-        LoginRequest loginRequest = new LoginRequest(email, invalidPassword);
+        LoginRequest request = new LoginRequest(email, invalidPassword);
 
         // Act & Assert
         mvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Invalid email or password"));
     }
@@ -144,12 +149,12 @@ class AuthenticationControllerIT {
         user.setRole(Role.PARENT);
         userRepository.save(user);
 
-        LoginRequest loginRequest = new LoginRequest("", password);
+        LoginRequest request = new LoginRequest("", password);
 
         // Act & Assert
         mvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Invalid email or password"));
     }
@@ -172,12 +177,12 @@ class AuthenticationControllerIT {
         user.setRole(Role.PARENT);
         userRepository.save(user);
 
-        LoginRequest loginRequest = new LoginRequest(email, "");
+        LoginRequest request = new LoginRequest(email, "");
 
         // Act & Assert
         mvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Invalid email or password"));
     }
@@ -190,13 +195,13 @@ class AuthenticationControllerIT {
         // Arrange
         String email = "test@test.test";
         String password = "P@ss123456";
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        ParentRegistrationRequest request = new ParentRegistrationRequest(email, password, FIRST_NAME, LAST_NAME);
 
 
         // Act & Assert
         mvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(content().string("User registered successfully"));
     }
@@ -210,15 +215,53 @@ class AuthenticationControllerIT {
         // Arrange
         String email = "test@test";
         String password = "P@ss123456";
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        ParentRegistrationRequest request = new ParentRegistrationRequest(email, password, FIRST_NAME, LAST_NAME);
 
 
         // Act & Assert
         mvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is(400))
                 .andExpect(content().string("Malformed email address"));
+    }
+
+    /**
+     * Registering with an empty first name should return 400.
+     */
+    @Test
+    void register_Parent_invalid_firstName_empty() throws Exception {
+        // Arrange
+        String email = "test@test.com";
+        String password = "P@ss123456";
+        ParentRegistrationRequest request = new ParentRegistrationRequest(email, password, "", LAST_NAME);
+
+
+        // Act & Assert
+        mvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().is(400))
+                .andExpect(content().string("First name is required"));
+    }
+
+    /**
+     * Registering with a nully first name should return 400.
+     */
+    @Test
+    void register_Parent_invalid_firstName_null() throws Exception {
+        // Arrange
+        String email = "test@test.com";
+        String password = "P@ss123456";
+        ParentRegistrationRequest request = new ParentRegistrationRequest(email, password, null, LAST_NAME);
+
+
+        // Act & Assert
+        mvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().is(400))
+                .andExpect(content().string("First name is required"));
     }
 
     /**
@@ -230,13 +273,13 @@ class AuthenticationControllerIT {
         // Arrange
         String email = "@test.test";
         String password = "P@ss123456";
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        ParentRegistrationRequest request = new ParentRegistrationRequest(email, password, FIRST_NAME, LAST_NAME);
 
 
         // Act & Assert
         mvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is(400))
                 .andExpect(content().string("Malformed email address"));
     }
@@ -250,13 +293,13 @@ class AuthenticationControllerIT {
         // Arrange
         String email = "test@.test";
         String password = "P@ss123456";
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        ParentRegistrationRequest request = new ParentRegistrationRequest(email, password, FIRST_NAME, LAST_NAME);
 
 
         // Act & Assert
         mvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is(400))
                 .andExpect(content().string("Malformed email address"));
     }
@@ -270,13 +313,13 @@ class AuthenticationControllerIT {
         // Arrange
         String email = "testtest.test";
         String password = "P@ss123456";
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        ParentRegistrationRequest request = new ParentRegistrationRequest(email, password, FIRST_NAME, LAST_NAME);
 
 
         // Act & Assert
         mvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is(400))
                 .andExpect(content().string("Malformed email address"));
     }
@@ -290,13 +333,13 @@ class AuthenticationControllerIT {
         // Arrange
         String email = "test@testtest";
         String password = "P@ss123456";
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        ParentRegistrationRequest request = new ParentRegistrationRequest(email, password, FIRST_NAME, LAST_NAME);
 
 
         // Act & Assert
         mvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is(400))
                 .andExpect(content().string("Malformed email address"));
     }
@@ -310,57 +353,55 @@ class AuthenticationControllerIT {
         // Arrange
         String email = "|test@testtest";
         String password = "P@ss123456";
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        ParentRegistrationRequest request = new ParentRegistrationRequest(email, password, FIRST_NAME, LAST_NAME);
 
 
         // Act & Assert
         mvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is(400))
                 .andExpect(content().string("Malformed email address"));
     }
 
 
     /**
-     * Registering with an invalid email and password should return 400.
-     * Malformed email using a character that is not permitted.
+     * Registering with a password shorter than the minimum should return 400.
      */
     @Test
     void register_Parent_invalid_password_tooShort() throws Exception {
         // Arrange
         String email = "test@test.test";
         String password = "P@ss123";
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        ParentRegistrationRequest request = new ParentRegistrationRequest(email, password, FIRST_NAME, LAST_NAME);
 
 
         // Act & Assert
         mvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is(400))
                 .andExpect(content().string("Password must be 8 to 40 characters"));
     }
 
 
     /**
-     * Registering with an invalid email and password should return 400.
-     * Malformed email using a character that is not permitted.
+     * Registering with a password longer than the maximum should return 400.
      */
     @Test
     void register_Parent_invalid_password_tooLong() throws Exception {
         // Arrange
-        String email = "test@testtest";
-        String password = "P@ss123456P@ss123456P@ss123456P@ss123456";
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        String email = "test@test.test";
+        String password = "P@ss123456P@ss123456P@ss123456P@ss123456P"; // 41 chars
+        ParentRegistrationRequest request = new ParentRegistrationRequest(email, password, FIRST_NAME, LAST_NAME);
 
 
         // Act & Assert
         mvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is(400))
-                .andExpect(content().string("Malformed email address"));
+                .andExpect(content().string("Password must be 8 to 40 characters"));
     }
 
     /**
@@ -371,13 +412,13 @@ class AuthenticationControllerIT {
         // Arrange
         String email = "";
         String password = "P@ss123456";
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        ParentRegistrationRequest request = new ParentRegistrationRequest(email, password, FIRST_NAME, LAST_NAME);
 
 
         // Act & Assert
         mvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is(400))
                 .andExpect(content().string("Malformed email address"));
     }
@@ -390,13 +431,13 @@ class AuthenticationControllerIT {
         // Arrange
         String email = "test@test.test";
         String password = "";
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        ParentRegistrationRequest request = new ParentRegistrationRequest(email, password, FIRST_NAME, LAST_NAME);
 
 
         // Act & Assert
         mvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is(400))
                 .andExpect(content().string("Password must be 8 to 40 characters"));
     }

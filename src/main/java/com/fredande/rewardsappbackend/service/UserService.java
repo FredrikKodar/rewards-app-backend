@@ -1,6 +1,7 @@
 package com.fredande.rewardsappbackend.service;
 
 import com.fredande.rewardsappbackend.config.CustomUserDetails;
+import com.fredande.rewardsappbackend.dto.ParentUpdateRequest;
 import com.fredande.rewardsappbackend.dto.UserIdAndFirstNameResponse;
 import com.fredande.rewardsappbackend.dto.UserResponse;
 import com.fredande.rewardsappbackend.enums.TaskStatus;
@@ -37,16 +38,16 @@ public class UserService {
     public UserIdAndFirstNameResponse updateChild(Integer childId, CustomUserDetails userDetails, UserIdAndFirstNameResponse updatedChild) {
         User parent = userRepository.findById(userDetails.getId()).orElseThrow(EntityNotFoundException::new);
         User child = userRepository.findById(childId).orElseThrow(EntityNotFoundException::new);
-        
+
         // Verify that the child belongs to this parent
         if (!child.getParent().getId().equals(parent.getId())) {
             throw new EntityNotFoundException();
         }
-        
+
         // Update the child's information
         child.setFirstName(updatedChild.firstName());
         User savedChild = userRepository.save(child);
-        
+
         return UserMapper.INSTANCE.userToUserIdAndFirstNameResponse(savedChild);
     }
 
@@ -67,21 +68,29 @@ public class UserService {
     public UserResponse getUserById(Integer id, CustomUserDetails userDetails) {
         User requestingUser = userRepository.findById(userDetails.getId()).orElseThrow(EntityNotFoundException::new);
         User targetUser = userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        
+
         // Allow users to access their own data
         if (id.equals(requestingUser.getId())) {
             return UserMapper.INSTANCE.userToUserResponse(requestingUser);
         }
-        
+
         // Allow parents to access their children's data
-        if (requestingUser.getRole().name().equals("ROLE_PARENT") && 
-            targetUser.getParent() != null && 
-            targetUser.getParent().getId().equals(requestingUser.getId())) {
+        if (requestingUser.getRole().name().equals("ROLE_PARENT") &&
+                targetUser.getParent() != null &&
+                targetUser.getParent().getId().equals(requestingUser.getId())) {
             return UserMapper.INSTANCE.userToUserResponse(targetUser);
         }
-        
+
         // Otherwise, throw exception
         throw new EntityNotFoundException();
+    }
+
+    @PreAuthorize("hasRole('PARENT')")
+    public UserResponse updateUser(ParentUpdateRequest request, CustomUserDetails userDetails) {
+        User savedUser = userRepository.findById(userDetails.getId()).orElseThrow();
+        savedUser.setFirstName(request.firstName());
+        savedUser.setLastName(request.lastName());
+        return UserMapper.INSTANCE.userToUserResponse(userRepository.save(savedUser));
     }
 
 }

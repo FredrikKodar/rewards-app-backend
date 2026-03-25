@@ -35,3 +35,6 @@ build/
 node_modules
 # Vite
 .vite
+
+# Frontend build artifacts
+src/main/resources/static/
