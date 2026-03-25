@@ -1,5 +1,6 @@
 package com.fredande.rewardsappbackend.dto;
 
+import com.fredande.rewardsappbackend.constants.ValidationConstants;
 import jakarta.validation.constraints.*;
 
 public class ParentRequest {
@@ -18,60 +19,10 @@ public class ParentRequest {
     private String password;
     @NotBlank(message = "First name is required")
     private String firstName;
+        @Pattern(regexp = ValidationConstants.EMAIL_REGEX,
+        @Size(min = ValidationConstants.MIN_PASSWORD_LENGTH,
+                max = ValidationConstants.MAX_PASSWORD_LENGTH,
 
-    @NotBlank(message = "Last name is required")
-    private String lastName;
-
-    public ParentRequest() {
-    }
-
-    public ParentRequest(String email, String password, String firstName, String lastName) {
-        this.email = email;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getFirstName() {
-    return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-public ParentRequest withFirstName(String firstName) {
-        this.firstName = firstName;
-        return this;
-    }
-
-    public ParentRequest withLastName(String lastName) {
-        this.lastName = lastName;
-        return this;
-    }
-
-}
+        @NotBlank(message = "Last name is required")
+        String lastName
+) {}
