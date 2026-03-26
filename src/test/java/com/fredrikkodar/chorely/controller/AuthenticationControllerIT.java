@@ -100,7 +100,7 @@ class AuthenticationControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
-                .andExpect(content().string("Invalid email or password"));
+                .andExpect(content().string("Invalid email/username or password"));
     }
 
 
@@ -129,7 +129,7 @@ class AuthenticationControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
-                .andExpect(content().string("Invalid email or password"));
+                .andExpect(content().string("Invalid email/username or password"));
     }
 
     /**
@@ -156,7 +156,7 @@ class AuthenticationControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
-                .andExpect(content().string("Invalid email or password"));
+                .andExpect(content().string("Invalid email/username or password"));
     }
 
 
@@ -184,7 +184,7 @@ class AuthenticationControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
-                .andExpect(content().string("Invalid email or password"));
+                .andExpect(content().string("Invalid email/username or password"));
     }
 
     /**

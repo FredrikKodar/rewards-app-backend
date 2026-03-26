@@ -53,7 +53,7 @@ public class AuthenticationServiceImpl implements AuthenticationServiceDef {
                     new UsernamePasswordAuthenticationToken(username, password)
             );
         } catch (AuthenticationException e) {
-            throw new BadCredentialsException("Invalid email or password", e);
+            throw new BadCredentialsException("Invalid email/username or password", e);
         }
         return userDetailsService.loadUserByUsername(username);
     }

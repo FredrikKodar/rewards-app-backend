@@ -27,10 +27,12 @@ api.interceptors.request.use((config) => {
 });
 
 // Redirect to login when session has expired (401 Unauthorized)
+// Skip auth/login endpoint — a 401 there means wrong credentials, not expired session
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const isLoginRequest = error.config?.url?.includes('/auth/login');
+    if (error.response?.status === 401 && !isLoginRequest) {
       clearAuthToken();
       window.location.href = '/login';
     }
@@ -43,25 +45,34 @@ export const clearAuthToken = () => {
   authToken = null;
 };
 
+const extractMessage = (data: any): string | null => {
+  if (typeof data === 'string' && data.trim().length > 0) return data;
+  if (data?.message) return data.message;
+  return null;
+};
+
 // Handle common error responses
 export const handleApiError = (error: any): never => {
   if (error.response) {
+    const message = extractMessage(error.response.data);
     switch (error.response.status) {
+      case 401:
+        throw new Error(message || 'Invalid credentials');
       case 403:
-        throw new Error('Forbidden: You do not have permission to access this resource');
+        throw new Error('You do not have permission to access this resource');
       case 404:
-        throw new Error('Resource not found: ' + (error.response.data.message || 'Endpoint not available'));
+        throw new Error(message || 'Resource not found');
       case 400:
-        throw new Error('Bad request: ' + (error.response.data.message || 'Invalid input data'));
+        throw new Error(message || 'Invalid input data');
       case 500:
-        throw new Error('Server error: ' + (error.response.data.message || 'Internal server error'));
+        throw new Error(message || 'Internal server error');
       default:
-        throw new Error('API error: ' + (error.response.data.message || 'Unknown error occurred'));
+        throw new Error(message || 'An unexpected error occurred');
     }
   } else if (error.request) {
     throw new Error('No response received from server. Is the backend running?');
   } else {
-    throw new Error('Request setup error: ' + error.message);
+    throw new Error(error.message);
   }
 };
 
