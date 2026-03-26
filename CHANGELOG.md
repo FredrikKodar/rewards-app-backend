@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/FredrikKodar/chorely/compare/v1.2.1...v1.2.2) (2026-03-26)
+
+
+### Bug Fixes
+
+* dont redirect to login and shoa clearer error message when using non-existent username ([#40](https://github.com/FredrikKodar/chorely/issues/40)) ([cd9c528](https://github.com/FredrikKodar/chorely/commit/cd9c528095de5a9d678a1c157e8e0eef3b80954d))
+
 ## [1.2.1](https://github.com/FredrikKodar/rewards-app-backend/compare/v1.2.0...v1.2.1) (2026-03-25)
 
 
